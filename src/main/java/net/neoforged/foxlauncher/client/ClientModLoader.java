@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-package net.minecraftforge.fmlonlyclient;
+package net.neoforged.foxlauncher.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.ClientPackSource;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
@@ -18,11 +17,9 @@ import net.minecraftforge.fml.LoadingFailedException;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.ModWorkManager;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientModLoader

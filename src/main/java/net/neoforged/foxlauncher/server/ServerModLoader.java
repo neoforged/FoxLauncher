@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-package net.minecraftforge.fmlonlyserver;
+package net.neoforged.foxlauncher.server;
 
 import joptsimple.OptionParser;
 import net.minecraftforge.fml.LoadingFailedException;

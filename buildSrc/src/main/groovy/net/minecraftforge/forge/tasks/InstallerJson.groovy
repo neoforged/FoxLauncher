@@ -13,7 +13,6 @@ import java.nio.file.Files
 abstract class InstallerJson extends DefaultTask {
     @OutputFile abstract RegularFileProperty getOutput()
     @InputFiles abstract ConfigurableFileCollection getInput()
-    @Input @Optional abstract SetProperty<String> getPackedDependencies()
     @Input @Optional final Map<String, Object> libraries = new LinkedHashMap<>()
     @Input Map<String, Object> json = new LinkedHashMap<>()
     @InputFile abstract RegularFileProperty getIcon()
@@ -40,28 +39,31 @@ abstract class InstallerJson extends DefaultTask {
             dependsOn(tsk)
             input.from(tsk.output)
         }
+
+        project.afterEvaluate {
+            dependsOn(project.tasks.universalJar)
+            input.from project.tasks.universalJar.archiveFile
+        }
     }
 
     @TaskAction
     protected void exec() {
         def libs = libraries
-        packedDependencies.get().forEach {
-            def path = Util.getMavenPath(project, it)
-            def dep = Util.getMavenDep(project, it)
-            def file = Util.getMavenFile(project, it)
 
-            libs.put(dep.toString(), [
+        def path = Util.getMavenPath(project.tasks.universalJar)
+        def dep = Util.getMavenDep(project.tasks.universalJar)
+        libs.put(dep.toString(), [
                 name: dep,
                 downloads: [
-                    artifact: [
-                        path: path,
-                        url: "https://maven.neoforged.net/releases/${path}",
-                        sha1: file.sha1(),
-                        size: file.length()
-                    ]
+                        artifact: [
+                                path: path,
+                                url: "https://maven.neoforged.net/releases/${path}",
+                                sha1: project.tasks.universalJar.archiveFile.get().asFile.sha1(),
+                                size: project.tasks.universalJar.archiveFile.get().asFile.length()
+                        ]
                 ]
-            ])
-        }
+        ])
+
         json.libraries = libs.values().sort{a,b -> a.name.compareTo(b.name)}
         json.icon = "data:image/png;base64," + new String(Base64.getEncoder().encode(Files.readAllBytes(icon.get().asFile.toPath())))
         json.json = launcherJsonName.get()

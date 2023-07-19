@@ -1,0 +1,29 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenLocal()
+        maven { url = 'https://maven.neoforged.net/releases' }
+    }
+}
+
+buildscript {
+    dependencies {
+        classpath('com.google.code.gson:gson') {
+            version {
+                strictly '2.10.1'
+            }
+        }
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.5.0'
+}
+
+rootProject.name = 'FoxLauncher'
+
+include ':mcp'
+include ':foxlauncher'
+
+project(":mcp").projectDir = file("projects/mcp")
+project(":foxlauncher").projectDir = file("projects/foxlauncher")

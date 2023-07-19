@@ -23,7 +23,7 @@
 /projects/mcp/
 /projects/clean/
 /projects/forge/
-/projects/fmlonly/
+/projects/foxlauncher/
 #/patches/*
 
 #occupational hazards
@@ -46,4 +46,3 @@ changelog.txt
 *.py
 *.7z
 /logs/
-

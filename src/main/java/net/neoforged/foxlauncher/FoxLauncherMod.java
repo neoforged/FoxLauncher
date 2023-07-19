@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-package net.minecraftforge.fmlonly;
+package net.neoforged.foxlauncher;
 
 import net.minecraftforge.fml.common.Mod;
 
-@Mod("fmlonly")
-public class FMLOnlyMod {}
+@Mod("foxlauncher")
+public class FoxLauncherMod {}
+

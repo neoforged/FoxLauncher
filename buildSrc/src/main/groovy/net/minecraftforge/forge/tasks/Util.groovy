@@ -3,6 +3,7 @@ package net.minecraftforge.forge.tasks
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.objectweb.asm.ClassReader
@@ -100,10 +101,21 @@ public class Util {
 		return ret
 	}
 
-    public static def getMavenPath(Project project, String notation) {
+	public static String getMavenPath(Task task) {
+		def classifier = task.archiveClassifier.get()
+		def dep = "${task.project.group}:${task.project.name}:${task.project.version}" + (classifier == '' ? '' : ':' + classifier)
+		return "${task.project.group.replace('.', '/')}/${task.project.name}/${task.project.version}/${task.project.name}-${task.project.version}".toString() + (classifier == '' ? '' : '-' + classifier) + '.jar'
+	}
+
+	public static String getMavenDep(Task task) {
+		def classifier = task.archiveClassifier.get()
+		return "${task.project.group}:${task.project.name}:${task.project.version}" + (classifier == '' ? '' : ':' + classifier)
+	}
+
+    public static String getMavenPath(Project project, String notation) {
 		def config = createConfiguration(project, notation);
 		def resolvedConfig = config.resolvedConfiguration
-		if (resolvedConfig.hasErrorProblems()) {
+		if (resolvedConfig.hasError()) {
 			resolvedConfig.rethrowFailure()
 		}
 
@@ -113,20 +125,20 @@ public class Util {
 		}
 
 		def dependency = firstLevelModuleDependencies.iterator().next()
-		def artifacts = dependency.allModuleArtifacts
+		def artifacts = dependency.moduleArtifacts
 		if (artifacts.size() != 1) {
 			throw new RuntimeException("Expected 1 artifact, got ${artifacts.size()}")
 		}
 
 		def artifact = artifacts.iterator().next()
 
-		return "${artifact.moduleVersion.id.group.replace('.', '/')}/${artifact.moduleVersion.id.name}/${artifact.moduleVersion.id.version}/${artifact.moduleVersion.id.name}-${artifact.moduleVersion.id.version}".toString() + (artifact.classifier == '' ? '' : '-' + artifact.classifier) + '.' + artifact.extension
+		return "${artifact.moduleVersion.id.group.replace('.', '/')}/${artifact.moduleVersion.id.name}/${artifact.moduleVersion.id.version}/${artifact.moduleVersion.id.name}-${artifact.moduleVersion.id.version}".toString() + (artifact.classifier == '' || artifact.classifier == null ? '' : '-' + artifact.classifier).toString() + '.' + artifact.extension
     }
 
-    public static def getMavenDep(Project project, String notation) {
+    public static String getMavenDep(Project project, String notation) {
 		def config = createConfiguration(project, notation);
 		def resolvedConfig = config.resolvedConfiguration
-		if (resolvedConfig.hasErrorProblems()) {
+		if (resolvedConfig.hasError()) {
 			resolvedConfig.rethrowFailure()
 		}
 
@@ -136,20 +148,20 @@ public class Util {
 		}
 
 		def dependency = firstLevelModuleDependencies.iterator().next()
-		def artifacts = dependency.allModuleArtifacts
+		def artifacts = dependency.moduleArtifacts
 		if (artifacts.size() != 1) {
 			throw new RuntimeException("Expected 1 artifact, got ${artifacts.size()}")
 		}
 
 		def artifact = artifacts.iterator().next()
 
-		return "${dependency.moduleGroup}:${dependency.moduleName}:${dependency.moduleVersion}:${artifact.classifier}@${artifact.extension}"
+		return "${dependency.moduleGroup}:${dependency.moduleName}:${dependency.moduleVersion}".toString() + (artifact.classifier == null || artifact.classifier == "" ? "" : ":${artifact.classifier}").toString() + (artifact.extension == null || artifact.extension == "jar" ? "" : "@${artifact.extension}").toString()
     }
 
-	public static def getMavenFile(Project project, String notation) {
+	public static File getMavenFile(Project project, String notation) {
 		def config = createConfiguration(project, notation);
 		def resolvedConfig = config.resolvedConfiguration
-		if (resolvedConfig.hasErrorProblems()) {
+		if (resolvedConfig.hasError()) {
 			resolvedConfig.rethrowFailure()
 		}
 
@@ -159,7 +171,7 @@ public class Util {
 		}
 
 		def dependency = firstLevelModuleDependencies.iterator().next()
-		def artifacts = dependency.allModuleArtifacts
+		def artifacts = dependency.moduleArtifacts
 		if (artifacts.size() != 1) {
 			throw new RuntimeException("Expected 1 artifact, got ${artifacts.size()}")
 		}
@@ -205,9 +217,9 @@ public class Util {
 	}
 
     static String getLatestForgeVersion(mcVersion) {
-        final json = new JsonSlurper().parseText(new URL('https://maven.neoforged.net/releases/net/neoforged/forge/promotions_slim.json').getText('UTF-8'))
-        final ver = json.promos["$mcVersion-latest"]
-        ver === null ? null : (mcVersion + '-' + ver)
+        final url = "https://maven.neoforged.net/api/maven/latest/version/releases/net/neoforged/forge?classifier=universal&filter=$mcVersion-"
+        final json = new JsonSlurper().parseText(new URL(url).getText('UTF-8'))
+        return json.version
     }
 
     static void processClassNodes(File file, Closure process) {

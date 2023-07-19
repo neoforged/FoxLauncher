@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-package net.minecraftforge.fmlonly;
+package net.neoforged.foxlauncher;
 
 import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class FMLOnlyBindings implements IBindingsProvider {
+public class FoxLauncherBindings implements IBindingsProvider {
     private static final IEventBus DUMMYFORGEBUS = BusBuilder.builder().build();
 
     @Override
