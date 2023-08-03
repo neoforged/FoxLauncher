@@ -1,0 +1,29 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    gradlePluginPortal()
+    mavenLocal()
+    maven { url = 'https://maven.neoforged.net/releases/' }
+    //maven { url = 'https://ldtteam.jfrog.io/artifactory/neogradle-next'}
+    mavenCentral()
+}
+
+dependencies {
+    api gradleApi()
+    api "org.gradle.toolchains:foojay-resolver:${project.foojay_resolver_version}"
+
+    api "net.neoforged.gradle:vanilla:${project.neogradle_version}"
+    api "net.neoforged.gradle:mcp:${project.neogradle_version}"
+    api "net.neoforged.gradle:userdev:${project.neogradle_version}"
+}
+
+gradlePlugin {
+    plugins {
+        conventions {
+            id = 'net.neoforged.gradle.foxlauncher.conventions'
+            implementationClass = 'net.neoforged.gradle.foxlauncher.FoxLauncherSettingsPlugin'
+        }
+    }
+}
